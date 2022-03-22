@@ -1,0 +1,7 @@
+.env
+# ignore virtualenv
+project1
+
+# ignore cache
+.cache
+__pycache__
