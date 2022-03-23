@@ -131,10 +131,6 @@ body {
     flex-direction: column;
     gap: 1rem;
   }
-  .form-login .user-info .personal-info {
-    display: flex;
-    gap: 1.25rem;
-  }
   .form-login .user-info .buttons {
     display: inline-block;
   }
@@ -148,4 +144,4 @@ body {
   }
 }
 
-/*# sourceMappingURL=register.css.map */
+/*# sourceMappingURL=login.css.map */

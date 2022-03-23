@@ -2,28 +2,18 @@
 {% extends 'layout/layout.html' %}
 
 {% block styles %}
-<link rel="stylesheet" href="/static/styles/register.css">
+<link rel="stylesheet" href="/static/styles/login.css">
 {% endblock %}
 
 {% block content %}
 <section class="login-container">
     <form class="form-login" id="register-form">
         <div class="login-presentation">
-            <h2>Descubre Multiples libros</h2>
-            <h1>Create a new account</h1>
-            <p>Already a login?. <a href="/login">Login</a></p>
+            <h2>Incia sesión y continua leyendo</h2>
+            <h1>Login</h1>
+            <p>No estas registrado?. <a href="/register">Register</a></p>
         </div>
         <div class="user-info">
-            <div class="personal-info">
-                <div class="container-input">
-                    <label for="username">Nombre</label>
-                    <input type="text" id="username" name="username" required placeholder="John">
-                </div>
-                <div class="container-input">
-                    <label for="lastname">Apellido</label>
-                    <input type="text" id="lastname" name="lastname" required placeholder="Doe">
-                </div>
-            </div>
             <div class="container-input">
                 <label for="email">Mail</label>
                 <input type="email" id="email" name="email" required placeholder="aguacate@gmail.com">
@@ -41,6 +31,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/scripts/register.js"></script>
+<script src="/static/scripts/login.js"></script>
 {% endblock %}
     

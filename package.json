@@ -4,7 +4,9 @@
   "description": "Web Programming with Python and JavaScript",
   "main": "index.js",
   "scripts": {
+    "start": "python loadenv.py && flask run",
     "sass:register": "sass ./static/sass/register.scss ./static/styles/register.css --watch",
+    "sass:login": "sass ./static/sass/login.scss ./static/styles/login.css --watch",
     "sass:layout": "sass ./static/sass/layout.scss ./static/styles/layout.css --watch"
   },
   "repository": {
