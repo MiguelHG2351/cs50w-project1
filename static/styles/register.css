@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-image: linear-gradient(to right, #000, #272c3a, rgba(40, 42, 57, 0.4)), url(/static/images/login-bg.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+}
+
+.header-site {
+  height: 72px;
+  box-shadow: 0 0px 1px 1px #000;
+}
+
+@media screen and (min-width: 768px) {
+  .login-container {
+    width: 90vw;
+    margin: auto;
+    color: #fff;
+    height: calc(100vh - 72px);
+  }
+
+  h1 {
+    margin: 0 auto;
+  }
+
+  .login-presentation p {
+    margin: 0 auto;
+  }
+
+  .form-login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: 1.5rem;
+    display: inline-flex;
+  }
+  .form-login .container-input {
+    background-color: #323645;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  .form-login .container-input:focus-within {
+    outline: 1px solid #1d90f4;
+    border: 1px solid #1d90f4;
+  }
+  .form-login .container-input:focus-within label {
+    color: #1d90f4;
+  }
+  .form-login .container-input label {
+    margin: 0.25rem;
+    font-size: 0.75rem;
+    color: #8e94a2;
+  }
+  .form-login .container-input input {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #fff;
+  }
+  .form-login .container-input input:focus {
+    border: none;
+    outline: none;
+  }
+  .form-login .container-input input:hover {
+    border: none;
+    outline: none;
+  }
+  .form-login .container-input input:internal-autofill-selected {
+    background-color: transparent;
+  }
+  .form-login .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .form-login .user-info .personal-info {
+    display: flex;
+    gap: 1.25rem;
+  }
+}
+
+/*# sourceMappingURL=register.css.map */

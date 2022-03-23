@@ -1,0 +1,21 @@
+{
+  "name": "project1",
+  "version": "1.0.0",
+  "description": "Web Programming with Python and JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "sass:register": "sass ./static/sass/register.scss ./static/styles/register.css --watch",
+    "sass:layout": "sass ./static/sass/layout.scss ./static/styles/layout.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiguelHG2351/cs50w-project1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MiguelHG2351/cs50w-project1/issues"
+  },
+  "homepage": "https://github.com/MiguelHG2351/cs50w-project1#readme"
+}

@@ -1,0 +1,81 @@
+@import "./layout.scss";
+
+@media screen and (min-width: 768px) {
+    .login-container {
+        width: 90vw;
+        margin: auto;
+        color: #fff;
+        height: calc(100vh - 72px);
+    }
+
+    h1 {
+        margin: 0 auto;
+    }
+
+    .login-presentation p {
+        margin: 0 auto;
+    }
+
+    .form-login {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        gap: 1.5rem;
+        display: inline-flex;
+
+        .container-input {
+            background-color: $inputBG;
+            padding: .5rem 1rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+
+            &:focus-within {
+                outline: 1px solid $primaryColor;
+                border: 1px solid $primaryColor;
+            }
+            
+            &:focus-within label {
+                color: $primaryColor;
+            }
+
+            label {
+                margin: .25rem;
+                font-size: .75rem;
+                color: $grayColor;
+            }
+
+            input {
+                width: 100%;
+                background-color: transparent;
+                border: none;
+                font-size: 1.25rem;
+                color: #fff;
+
+                &:focus {
+                    border: none;
+                    outline: none;
+                }
+
+                &:hover {
+                    border: none;
+                    outline: none;
+                }
+
+                &:internal-autofill-selected {
+                    background-color: transparent;
+                }
+            }
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            .personal-info {
+                display: flex;
+                gap: 1.25rem;
+            }
+        }
+    }
+}

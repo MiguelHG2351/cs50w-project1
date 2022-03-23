@@ -1,0 +1,40 @@
+
+{% extends 'layout/layout.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/styles/register.css">
+{% endblock %}
+
+{% block content %}
+<section class="login-container">
+    <form class="form-login" autocomplete="off">
+        <div class="login-presentation">
+            <p>Descubre Multiples libros</p>
+            <h1>Create a new account</h1>
+            <p>Already a login?. <a href="/register">Login</a></p>
+        </div>
+        <div class="user-info">
+            <div class="personal-info">
+                <div class="container-input">
+                    <label for="username">Nombre</label>
+                    <input type="text" id="username" placeholder="username: John">
+                </div>
+                <div class="container-input">
+                    <label for="lastname">Apellido</label>
+                    <input type="text" id="lastname" placeholder="Apellido: Doe">
+                </div>
+            </div>
+            <div class="container-input">
+                <label for="email">Mail</label>
+                <input type="email" id="email" placeholder="email: aguacate@gmail.com" autocomplete="off">
+            </div>
+            <div class="container-input">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="password: Pan con jamón">
+            </div>
+            <button>Login</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+    
