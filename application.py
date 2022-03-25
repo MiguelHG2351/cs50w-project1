@@ -5,6 +5,7 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import datetime
+import requests
 
 # JWT
 import jwt
@@ -47,6 +48,14 @@ def isAutenticated(f):
 @isAutenticated
 def index():
     return render_template("index.html")
+
+@app.route("/books")
+@isAutenticated
+def books_fn():
+    get_host_and_protocol = request.url_root
+    get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/get_books?limit=10')
+
+    return render_template("books.html", books=get_some_books.json())
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -118,3 +127,46 @@ def login():
     response = make_response(render_template("login.html"))
 
     return response
+
+# API
+@app.route('/api/v1/get_books', methods=['GET'])
+def get_books():
+    limit = request.args.get('limit') or 10
+    books = db.execute("SELECT * FROM books limit :_limit", {"_limit": int(limit, 10)}).fetchall()
+    books_array = []
+
+    for isbn, title, author, year in books:
+        books_array.append({
+            "isbn": isbn,
+            "title": title,
+            "author": author,
+            "year": year
+        })
+
+    return jsonify(books_array)
+
+@app.route('/api/v1/find_books', methods=['GET'])
+def find_books():
+    available_filters = ('isbn', 'title', 'author')
+    limit = 10
+    filterBy = request.args.get('filterBy')
+
+    if filterBy not in available_filters:
+        return jsonify({"success": False, "message": "Filter not available"})
+    
+    value = "%" + request.args.get('value') + "%"
+    query = f"SELECT * FROM books where {filterBy} like '{value}' limit {limit}"
+    books = db.execute(query).fetchall()
+    print(filterBy, request.args.get('value'))
+    # get query string
+    books_array = []
+
+    for isbn, title, author, year in books:
+        books_array.append({
+            "isbn": isbn,
+            "title": title,
+            "author": author,
+            "year": year
+        })
+
+    return jsonify(books_array)

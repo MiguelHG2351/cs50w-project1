@@ -1,0 +1,45 @@
+{% extends 'layout/layout.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/styles/books.css">
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/books.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="container">
+
+    <form id="findBook">
+        <input type="text" name="find" placeholder="Buscar libro">
+        <label>
+            ISBN
+            <input type="radio" value="isbn" name="filterBy" id="isbn">
+        </label>
+        <label>
+            Titulo
+            <input type="radio" value="title" name="filterBy" id="title">
+        </label>
+        <label>
+            Autor
+            <input type="radio" value="author" name="filterBy" id="author">
+        </label>
+    </form>
+
+    <ul class="list-books">
+        {% for book in books %}
+            <li>
+                <div class="book-image">
+                    <img src="https://dummyimage.com/120x120.png/dddddd/000000" alt="{{ book.title }}">
+                </div>
+                <div class="books-description">
+                    <h2>{{ book.title }}</h2>
+                    <button>Más información</button>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
+

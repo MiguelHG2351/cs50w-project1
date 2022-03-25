@@ -1,5 +1,15 @@
 @import "./layout.scss";
 
+body {
+    background-image: linear-gradient(to right, #282a37, #272c3a, rgba(40, 42, 57, .4)), url(/static/images/login-bg.jpg);
+	color: #fff;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+	min-height: 100vh;
+    overflow: hidden;
+}
+
 @media screen and (min-width: 768px) {
     .login-container {
         width: 90vw;

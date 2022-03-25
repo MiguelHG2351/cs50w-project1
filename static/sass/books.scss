@@ -1,0 +1,13 @@
+@import "./layout.scss";
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+
+    .list-books {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));	
+        list-style: none;
+        gap: 2rem;
+    }
+}

@@ -28,7 +28,12 @@ $form.addEventListener('submit', (e) => {
     }).then(res => res.json())
     .then(res => {
         if(res.success) {
-            location.href = '/login';
+            location.href = '/';
+        }
+    })
+    .catch(res => {
+        if(res.success) {
+            location.reload()
         }
     })
 })

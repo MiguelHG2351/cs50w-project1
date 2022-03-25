@@ -3,10 +3,6 @@ body {
   margin: 0;
   height: 100vh;
   overflow: hidden;
-  background-image: linear-gradient(to right, #282a37, #272c3a, rgba(40, 42, 57, 0.4)), url(/static/images/login-bg.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: #fff;
   font-family: "Inter", sans-serif;
 }
 
@@ -44,6 +40,13 @@ body {
   color: #8e94a2;
   text-decoration: none;
   display: inline-block;
+}
+
+body {
+  background-image: linear-gradient(to right, #282a37, #272c3a, rgba(40, 42, 57, 0.4)), url(/static/images/login-bg.jpg);
+  color: #fff;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 @media screen and (min-width: 768px) {
