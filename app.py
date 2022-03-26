@@ -19,8 +19,8 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Check for environment variable
-if not os.getenv("DATABASE_URL"):
-    raise RuntimeError("DATABASE_URL is not set")
+if not os.getenv("URL_DATABASE"):
+    raise RuntimeError("URL_DATABASE is not set")
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -28,7 +28,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Set up database
-engine = create_engine(os.getenv("DATABASE_URL"))
+engine = create_engine(os.getenv("URL_DATABASE"))
 db = scoped_session(sessionmaker(bind=engine))
 
 def isAutenticated(f):
