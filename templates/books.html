@@ -35,7 +35,9 @@
                 </div>
                 <div class="books-description">
                     <h2>{{ book.title }}</h2>
-                    <button>Más información</button>
+                    <strong>{{ book.author }}</strong>
+                    <p>{{ book.isbn }}</p>
+                    <a href="/books/{{ book.isbn }}">Más información</a>
                 </div>
             </li>
         {% endfor %}
