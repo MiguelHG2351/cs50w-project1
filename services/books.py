@@ -2,10 +2,10 @@
 from lib.db import SQL_Lib
 
 db = SQL_Lib()
-def getAllBooks():
-    return db.get_all("books")
+def get_all_books(limit):
+    return db.get_all("books", limit)
 
-def findBooks(field, value, limit):
+def find_books(field, value, limit):
     return db.find("books", field, value, limit)
 
 def find_isbn(isbn):

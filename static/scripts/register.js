@@ -1,5 +1,5 @@
 'use strict'
-
+import { alertError, alertSuccess } from './lib/alerts.js'
 const $form = document.querySelector('#register-form');
 
 $form.addEventListener('submit', (e) => {
@@ -27,13 +27,16 @@ $form.addEventListener('submit', (e) => {
         body: formData,
     }).then(res => res.json())
     .then(res => {
+        console.log(res);
         if(res.success) {
+            alertSuccess('Cuenta creada :D');
             location.href = '/';
+        } else {
+            alertError(res.message);
         }
     })
     .catch(res => {
-        if(res.success) {
-            location.reload()
-        }
+        alertError('Error al crear la cuenta');
+        console.log(res);
     })
 })

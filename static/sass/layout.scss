@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-$grayColor: #8e94a2;
-$primaryColor: #1d90f4;
-$inputBG:#323645;
+@import 'var.scss';
 
 body {
     margin: 0;
@@ -55,6 +53,54 @@ body {
                     display: inline-block;
                 }
             }
+        }
+    }
+}
+
+.alert-message {
+    position: fixed;
+    z-index: 1000;
+    align-items: center;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    padding: 12px;
+    gap: 0 12px;
+    border-radius: 4px;
+    transform: translateX(-500px);
+    &.active {
+        transition: transform .3s ease;
+        transform: translateX(0);
+    }
+    &.error-alert {
+        background: #f96179;
+        & .message-icon {
+            background: #fb889a;
+        }
+    }
+
+    &.success-alert {
+        background: #789dff;
+        & .message-icon {
+            background: #98b4ff;
+        }
+    }
+
+    .message-icon {
+        border-radius: 50%;
+        padding: 0px;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .message {
+        color: #eee;
+        p {
+            font-size: 14px;
+            margin: 0;
         }
     }
 }

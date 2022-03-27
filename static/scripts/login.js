@@ -1,5 +1,5 @@
 'use strict'
-
+import { alertError, alertSuccess } from './lib/alerts.js'
 const $form = document.querySelector('#register-form');
 
 $form.addEventListener('submit', (e) => {
@@ -28,7 +28,10 @@ $form.addEventListener('submit', (e) => {
     }).then(res => res.json())
     .then(res => {
         if(res.success) {
+            alertSuccess('Sesión iniciada :D');
             location.href = '/';
+        } else {
+            alertError(res.message);
         }
     })
 })

@@ -17,19 +17,44 @@ class SQL_Lib():
         self.engine = create_engine(os.getenv("URL_DATABASE"))
         self.db = scoped_session(sessionmaker(bind=self.engine))
 
-    def get_all(table):
-        return db.execute(f"SELECT * FROM {table}").fetchall()
+    def get_all(self, table, limit):
+        try:
+            query = f"SELECT * FROM {table} limit :_limit"
+            data = db.execute(query, {'_limit': limit or 10}).fetchall()
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": 'Efe'}
 
-    def find(table, field, value, limit):
-        return db.execute(f"SELECT * FROM {table} WHERE {field} like :value LIMIT :limit", {"value": f'%{value}%', "limit": limit}).fetchall()
+    def find(self, table, field, value, limit):
+        try:
+            data = db.execute(f"SELECT * FROM {table} WHERE {field} like :value LIMIT :limit", {"value": f'%{value}%', "limit": limit}).fetchall()
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": e}
 
-    def find_by_id(table, value,  field='id'):
-        return db.execute(f"SELECT * FROM {table} WHERE {field} = :value", {"value": value}).fetchone()
+    def find_by_id(self, table, value,  field='id'):
+        try:
+            data = db.execute(f"SELECT * FROM {table} WHERE {field} = :value", {"value": value}).fetchone()
+            return {'success': True, 'data': data}
+        except Exception as e:
+            return {'success': False, 'message': e}
 
-    def create(table, fields, values):
-        db.execute(f"INSERT INTO {table} ({fields}) VALUES ({values})")
-        db.commit()
+    def create(self, table, data_dict):
+        field = ', '.join(str(x) for x in data_dict.keys())
+        value = ', '.join("'"+str(x)+"'" for x in data_dict.values())
+        try:
+            data = db.execute(f"INSERT INTO {table} ({field}) VALUES ({value})")
+            db.commit()
+            return {'success': True, 'data': data}
+        except Exception as e:
+            db.rollback()
+            return {'success': False, 'message': e}
 
-    def update(table, field, value):
-        db.execute(f"UPDATE {table} SET {field} = {value}")
-        db.commit()
+    def update(self, table, field, value):
+        try:
+            data = db.execute(f"UPDATE {table} SET {field} = {value}")
+            db.commit()
+            return {'success': True, 'data': data}
+        except Exception as e:
+            db.rollback()
+            return {'success': False, 'message': e}

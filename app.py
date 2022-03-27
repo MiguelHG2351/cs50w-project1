@@ -1,11 +1,16 @@
 import os
 
-from flask import Flask, jsonify, session, render_template, request, flash, redirect, make_response
+from flask import Flask, jsonify, render_template, request, redirect, make_response
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import datetime
 import requests
+
+# custom orm
+from lib.db import SQL_Lib
+from services.books import get_all_books, find_books
+from services.users import find_user, create_user, find_one_user
 
 # JWT
 import jwt
@@ -30,6 +35,8 @@ Session(app)
 # Set up database
 engine = create_engine(os.getenv("URL_DATABASE"))
 db = scoped_session(sessionmaker(bind=engine))
+# set up database2
+SQL_Lib()
 
 def isAutenticated(f):
     @wraps(f)
@@ -53,16 +60,18 @@ def index():
 @isAutenticated
 def books_fn():
     get_host_and_protocol = request.url_root
-    get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/get_books?limit=10')
+    try:
+        get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/get_books?limit=10')
+    except Exception as e:
+        print('K')
 
     return render_template("books.html", books=get_some_books.json())
 
 @app.route("/books/<book_isbn>")
 @isAutenticated
-def books_fn(book_isbn):
+def books_info(book_isbn):
     get_host_and_protocol = request.url_root
     get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/find_books?filterBy=10&isbn={book_isbn}').json()
-
 
     return render_template("books.html", book=get_some_books)
 
@@ -77,8 +86,12 @@ def register():
 
         if(username == "" or lastname == "" or email == "" or password == ""):
             return jsonify({"success": False, "message": "Please fill in all the fields"})
-        if(db.execute("SELECT * FROM users WHERE email = :email", {"email": email}).rowcount != 0):
-            return jsonify({"success": False, "message": "Username already exists"})
+
+        _find_user = find_user(email)
+        if(not _find_user['success']):
+            return jsonify({"success": False, "message": "Unexpected Error"})
+        if(len(_find_user['data']) > 0):
+            return jsonify({"success": False, "message": "Account already exists"})
 
         payload = {
             "username": username,
@@ -89,23 +102,23 @@ def register():
         }
         token = jwt.encode(payload, key=os.getenv(
             'JWT_SECRET_KEY'), algorithm='HS256')
-        try:
-            create_user = db.execute("INSERT INTO users (username, lastname, email, password) VALUES (:username, :lastname, :email, :password)", {
-                "username": username, "lastname": lastname, "email": email, "password": generate_password_hash(password)})
-            db.commit()
-            flash("User created successfully")
 
-            print(create_user)
-            response = make_response(jsonify({
-                'success': True,
-            }))
-            response.set_cookie('token', token)
-            return response
-        except Exception as e:
-            print(e)
-            db.rollback()
-            flash("Something went wrong")
-            return redirect("/register")
+        _create_user = create_user(username, lastname, email, generate_password_hash(password))
+        if(not _create_user['success']):
+            print(_create_user['message'])
+            return jsonify({"success": False, "message": "Can't create user"})
+
+        print(_create_user)
+        response = make_response(jsonify({
+            'success': True,
+        }))
+        response.set_cookie('token', token)
+        return response
+        # except Exception as e:
+        #     print(e)
+        #     db.rollback()
+        #     flash("Something went wrong")
+        #     return jsonify({"success": False, "message": "Something went wrong"})
 
     return render_template("register.html")
 
@@ -116,10 +129,11 @@ def login():
         password = request.form.get("password")
 
         if(email == "" or password == ""):
-            flash("Please fill in all the fields")
-            return redirect("/register")
-        user = db.execute("SELECT * FROM users WHERE email = :email", {"email": email})
-        if(user.rowcount != 0 and check_password_hash((user.fetchone())[3], password)):
+            return jsonify({"success": False, "message": "Please fill in all the fields"})
+
+        get_user = find_one_user(email)
+        print(get_user)
+        if(get_user['success'] and check_password_hash((get_user['data'])[3], password)):
             response = make_response(jsonify({
                 'success': True,
             }))
@@ -131,31 +145,47 @@ def login():
 
             response.set_cookie('token', token)
             return response
-
+        else:
+            return jsonify({"success": False, "message": "Wrong credentials"})
 
     response = make_response(render_template("login.html"))
 
     return response
 
+@app.route('/logout')
+def logout():
+    response = make_response(redirect('/'))
+    response.set_cookie('token', '', expires=0)
+    return response
+
 # API
 @app.route('/api/v1/get_books', methods=['GET'])
 def get_books():
-    limit = request.args.get('limit') or 10
-    books = db.execute("SELECT * FROM books limit :_limit", {"_limit": int(limit, 10)}).fetchall()
-    books_array = []
+    limit = request.args.get('limit') or 10 # Se pasa a int por que el parametro viene como string
+    if type(limit) != int:
+        try:
+            limit = int(limit)
+        except:
+            return jsonify({"success": False, "message": "Limit must be an integer"})
+    books = get_all_books(limit) # Busca todos los libros
+    print('books')
 
-    for isbn, title, author, year in books:
-        books_array.append({
-            "isbn": isbn,
-            "title": title,
-            "author": author,
-            "year": year
-        })
-
-    return jsonify(books_array)
+    print(len(books["data"]))
+    if(books['success']):
+        books_array = []
+        for isbn, title, author, year in books['data']:
+            books_array.append({
+                "isbn": isbn,
+                "title": title,
+                "author": author,
+                "year": year
+            })
+        return jsonify(books_array)
+    else:
+        return jsonify({"success": False, "message": "Something went wrong"})
 
 @app.route('/api/v1/find_books', methods=['GET'])
-def find_books():
+def find_books_():
     available_filters = ('isbn', 'title', 'author')
     limit = 10
     filterBy = request.args.get('filterBy')
@@ -163,14 +193,10 @@ def find_books():
     if filterBy not in available_filters:
         return jsonify({"success": False, "message": "Filter not available"})
     
-    value = "%" + request.args.get('value') + "%"
-    query = f"SELECT * FROM books where {filterBy} like '{value}' limit {limit}"
-    books = db.execute(query).fetchall()
-    print(filterBy, request.args.get('value'))
-    # get query string
+    books = find_books(filterBy, request.args.get('value'), limit) # Busca todos los libros por cierto campo
     books_array = []
 
-    for isbn, title, author, year in books:
+    for isbn, title, author, year in books['data']:
         books_array.append({
             "isbn": isbn,
             "title": title,
@@ -179,3 +205,9 @@ def find_books():
         })
 
     return jsonify(books_array)
+
+@app.errorhandler(404)
+def not_found(error):
+    if request.cookies.get('token'):
+        return redirect('/')
+    return redirect('/login')
