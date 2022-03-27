@@ -57,6 +57,15 @@ def books_fn():
 
     return render_template("books.html", books=get_some_books.json())
 
+@app.route("/books/<book_isbn>")
+@isAutenticated
+def books_fn(book_isbn):
+    get_host_and_protocol = request.url_root
+    get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/find_books?filterBy=10&isbn={book_isbn}').json()
+
+
+    return render_template("books.html", book=get_some_books)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
