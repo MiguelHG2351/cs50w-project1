@@ -9,6 +9,7 @@
     "sass:login": "sass ./static/sass/login.scss ./static/styles/login.css --watch",
     "sass:index": "sass ./static/sass/index.scss ./static/styles/index.css --watch",
     "sass:books": "sass ./static/sass/books.scss ./static/styles/books.css --watch",
+    "sass:book": "sass ./static/sass/book.scss ./static/styles/book.css --watch",
     "sass:layout": "sass ./static/sass/layout.scss ./static/styles/layout.css --watch"
   },
   "repository": {

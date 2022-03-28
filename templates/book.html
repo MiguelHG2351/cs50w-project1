@@ -1,0 +1,34 @@
+{% extends 'layout/layout.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/styles/book.css">
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/book.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="container">
+    <ul class="list-books">
+            <li>
+                <div class="book-image">
+                    <img src="{{ book.picture }}" alt="{{ book.title }}">
+                </div>
+                <div class="books-description">
+                    <h2>{{ book.title }}</h2>
+                    <strong>{{ book.author }}</strong>
+                    <p>{{ book.isbn }}</p>
+                    <p>Score {{book.average_score}}</p>
+                    <p>Count {{book.review_count}}</p>
+                    <p>publicado em el año {{book.year}} </p>
+                    <a href="/books/{{ book.isbn }}">Más información</a>
+                </div>
+            </li>
+    </ul>
+    <section class="google-books">
+
+    </section>
+</section>
+{% endblock %}
+

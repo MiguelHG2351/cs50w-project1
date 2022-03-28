@@ -35,6 +35,7 @@ class SQL_Lib():
     def find_by_id(self, table, value,  field='id'):
         try:
             data = db.execute(f"SELECT * FROM {table} WHERE {field} = :value", {"value": value}).fetchone()
+            print(data)
             return {'success': True, 'data': data}
         except Exception as e:
             return {'success': False, 'message': e}
@@ -45,7 +46,8 @@ class SQL_Lib():
         try:
             data = db.execute(f"INSERT INTO {table} ({field}) VALUES ({value})")
             db.commit()
-            return {'success': True, 'data': data}
+            # return id
+            return {'success': True, 'data': data.lastrowid}
         except Exception as e:
             db.rollback()
             return {'success': False, 'message': e}

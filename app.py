@@ -9,7 +9,7 @@ import requests
 
 # custom orm
 from lib.db import SQL_Lib
-from services.books import get_all_books, find_books
+from services.books import get_all_books, find_books, find_isbn
 from services.users import find_user, create_user, find_one_user
 
 # JWT
@@ -71,9 +71,10 @@ def books_fn():
 @isAutenticated
 def books_info(book_isbn):
     get_host_and_protocol = request.url_root
-    get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/find_books?filterBy=10&isbn={book_isbn}').json()
+    print(book_isbn)
+    get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/get_book?isbn={book_isbn}').json()
 
-    return render_template("books.html", book=get_some_books)
+    return render_template("book.html", book=get_some_books)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -104,11 +105,10 @@ def register():
             'JWT_SECRET_KEY'), algorithm='HS256')
 
         _create_user = create_user(username, lastname, email, generate_password_hash(password))
+        
         if(not _create_user['success']):
-            print(_create_user['message'])
             return jsonify({"success": False, "message": "Can't create user"})
 
-        print(_create_user)
         response = make_response(jsonify({
             'success': True,
         }))
@@ -132,13 +132,14 @@ def login():
             return jsonify({"success": False, "message": "Please fill in all the fields"})
 
         get_user = find_one_user(email)
-        print(get_user)
+
         if(get_user['success'] and check_password_hash((get_user['data'])[3], password)):
             response = make_response(jsonify({
                 'success': True,
             }))
             token = jwt.encode({
                 "email": email,
+                'id': (get_user['data'])[0],
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
                 "nbf": datetime.datetime.utcnow()
             }, key=os.getenv('JWT_SECRET_KEY'), algorithm='HS256')
@@ -168,9 +169,7 @@ def get_books():
         except:
             return jsonify({"success": False, "message": "Limit must be an integer"})
     books = get_all_books(limit) # Busca todos los libros
-    print('books')
 
-    print(len(books["data"]))
     if(books['success']):
         books_array = []
         for isbn, title, author, year in books['data']:
@@ -181,6 +180,29 @@ def get_books():
                 "year": year
             })
         return jsonify(books_array)
+    else:
+        return jsonify({"success": False, "message": "Something went wrong"})
+
+@app.route('/api/v1/get_book', methods=['GET'])
+def get_book():
+    isbn = request.args.get('isbn')
+    if(isbn == None):
+        return jsonify({"success": False, "message": "Please provide an ISBN"})
+    book = find_isbn(isbn)
+    get_google_book_info = requests.get(f'https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}').json()['items'][0]
+    print(get_google_book_info)
+    
+    if(book['success']):
+        data = book['data']
+        return jsonify({
+            "isbn": data['isbn'],
+            "title": data['title'],
+            "author": data['author'],
+            "year": data['year'],
+            "review_count": get_google_book_info['volumeInfo']['ratingsCount'],
+            "average_score": get_google_book_info['volumeInfo']['averageRating'],
+            'picture': get_google_book_info['volumeInfo']['imageLinks']['thumbnail'],
+        })
     else:
         return jsonify({"success": False, "message": "Something went wrong"})
 
@@ -204,7 +226,10 @@ def find_books_():
             "year": year
         })
 
-    return jsonify(books_array)
+    return jsonify({
+        "success": True,
+        "data": books_array
+    })
 
 @app.errorhandler(404)
 def not_found(error):
