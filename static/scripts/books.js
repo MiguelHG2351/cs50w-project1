@@ -10,6 +10,9 @@ $form.addEventListener('submit', async(e) => {
         console.log(books)
         return alertError(books.message)
     }
+    if(books.data.length === 0) {
+        return alertError('No se encontraron libros')
+    }
     console.log(books)
     const listArray = books.data.map(book => renderTemplate(book.title, book.isbn, book.author))
     $listBook.innerHTML = '';

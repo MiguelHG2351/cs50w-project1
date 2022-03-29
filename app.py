@@ -9,8 +9,11 @@ import requests
 
 # custom orm
 from lib.db import SQL_Lib
+
+# services
 from services.books import get_all_books, find_books, find_isbn
 from services.users import find_user, create_user, find_one_user
+from services.opinion import uploadOpinion, get_opinion, get_all_opinions
 
 # JWT
 import jwt
@@ -67,14 +70,41 @@ def books_fn():
 
     return render_template("books.html", books=get_some_books.json())
 
-@app.route("/books/<book_isbn>")
+@app.route("/books/<book_isbn>", methods=["GET", "POST"])
 @isAutenticated
 def books_info(book_isbn):
+    if request.method == "POST":
+        opinion = request.form.get("opinion")
+        score = request.form.get("score")
+        created_at_time = datetime.datetime.now()
+        try:
+            user_id = jwt.decode(request.cookies.get('token'), os.getenv('JWT_SECRET_KEY'), algorithms=['HS256'])['id']
+            find_opinion = get_opinion(user_id, book_isbn)
+            if find_opinion['data'] is None or str(find_opinion['data'][3]) != book_isbn and find_opinion['data'][2] != user_id:
+                    si = uploadOpinion(user_id, book_isbn, opinion, score, created_at_time)
+                    return jsonify({"success": True, "message": "Opinion uploaded"})
+            else:
+                return jsonify({"success": False, "message": "You already have an opinion"}), 400
+        except Exception as e:
+            return redirect('/books')
+        
     get_host_and_protocol = request.url_root
-    print(book_isbn)
+    _get_all_opinions = get_all_opinions(book_isbn)
+    print( _get_all_opinions)
+    opinions_array = []
+    for id, user_score, user_id, book_id, user_comment, created_at in _get_all_opinions['data']:
+        opinions_array.append({
+            "user_score": user_score,
+            "user_id": user_id,
+            "book_id": book_id,
+            "user_comment": user_comment,
+            "created_at": created_at
+        })
+    print(opinions_array)
     get_some_books = requests.get(f'{get_host_and_protocol}/api/v1/get_book?isbn={book_isbn}').json()
 
-    return render_template("book.html", book=get_some_books)
+
+    return render_template("book.html", book=get_some_books, opinions=opinions_array)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -94,26 +124,14 @@ def register():
         if(len(_find_user['data']) > 0):
             return jsonify({"success": False, "message": "Account already exists"})
 
-        payload = {
-            "username": username,
-            "lastname": lastname,
-            "email": email,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
-            "nbf": datetime.datetime.utcnow()
-        }
-        token = jwt.encode(payload, key=os.getenv(
-            'JWT_SECRET_KEY'), algorithm='HS256')
-
         _create_user = create_user(username, lastname, email, generate_password_hash(password))
         
         if(not _create_user['success']):
             return jsonify({"success": False, "message": "Can't create user"})
 
-        response = make_response(jsonify({
+        return jsonify({
             'success': True,
-        }))
-        response.set_cookie('token', token)
-        return response
+        })
         # except Exception as e:
         #     print(e)
         #     db.rollback()
@@ -190,7 +208,6 @@ def get_book():
         return jsonify({"success": False, "message": "Please provide an ISBN"})
     book = find_isbn(isbn)
     get_google_book_info = requests.get(f'https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}').json()['items'][0]
-    print(get_google_book_info)
     
     if(book['success']):
         data = book['data']

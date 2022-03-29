@@ -30,7 +30,7 @@ $form.addEventListener('submit', (e) => {
         console.log(res);
         if(res.success) {
             alertSuccess('Cuenta creada :D');
-            location.href = '/';
+            location.href = '/login';
         } else {
             alertError(res.message);
         }
