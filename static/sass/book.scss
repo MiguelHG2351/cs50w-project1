@@ -1,1 +1,42 @@
 @import 'var.scss';
+
+.container {
+    width: 85%;
+    margin: 0 auto;
+}
+
+.book_info {
+    display: flex;
+    gap: 0 1.5rem;
+
+    .book-image {
+        img {
+            height: 300px;
+            width: auto;
+            object-fit: cover;
+        }
+    }
+
+    .books-description {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+}
+
+.opinions {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem 0;
+    color: #fff;
+}
+
+.opinion {
+    border-radius: 12px;
+    background-color: #394F5B;
+    padding: 1.25rem;
+    .head-opinion {
+        display: flex;
+        justify-content: space-between;
+    }
+}

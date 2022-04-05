@@ -12,7 +12,7 @@ from lib.db import SQL_Lib
 
 # services
 from services.books import get_all_books, find_books, find_isbn
-from services.users import find_user, create_user, find_one_user
+from services.users import find_user, create_user, find_one_user, find_one_id
 from services.opinion import uploadOpinion, get_opinion, get_all_opinions
 
 # JWT
@@ -93,8 +93,10 @@ def books_info(book_isbn):
     print( _get_all_opinions)
     opinions_array = []
     for id, user_score, user_id, book_id, user_comment, created_at in _get_all_opinions['data']:
+        user_info = find_one_id(user_id)
         opinions_array.append({
             "user_score": user_score,
+            "user_name": user_info['data'][1],
             "user_id": user_id,
             "book_id": book_id,
             "user_comment": user_comment,

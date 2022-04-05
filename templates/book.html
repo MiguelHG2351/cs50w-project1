@@ -10,18 +10,22 @@
 
 {% block content %}
 <section class="container">
-    <section>
+    <section class="book_info">
         <div class="book-image">
             <img src="{{ book.picture }}" alt="{{ book.title }}">
         </div>
         <div class="books-description">
-            <h2>{{ book.title }}</h2>
-            <strong>{{ book.author }}</strong>
-            <p>{{ book.isbn }}</p>
-            <p>Score {{book.average_score}}</p>
-            <p>Count {{book.review_count}}</p>
-            <p>publicado em el año {{book.year}} </p>
-            <a href="/books/{{ book.isbn }}">Más información</a>
+            <div class="book_head">
+                <h2>{{ book.title }} <strong>{{ book.isbn }}</strong></h2>
+                <p>{{ book.author }}</p>
+            </div>
+            <div class="stadistic">
+                <p>Score {{book.average_score}}</p>
+                <p>Opiniones {{book.review_count}}</p>
+                <p>publicado en el año {{book.year}} </p>
+                <div class="star_container" id="star-container">
+                </div>
+            </div>
         </div>
     </section>
     <section class="opinions">
@@ -38,14 +42,24 @@
     </section>
     <section class="list-opinion">
         <h2>Opiniones</h2>
-        {% for opinion in opinions %}
-        <div class="opinion">
-            <p>{{ opinion.user_comment }}</p>
-            <p>Score {{opinion.user_score}}</p>
-            <p>{{ opinion.created_at.strftime('%d %b %Y') }}</p>
+        <div class="opinions">
+            {% for opinion in opinions %}
+            <div class="opinion">
+                <div class="head-opinion">
+                    <p>El usuario {{ opinion.user_name }} opina:</p>
+                    <p>Score {{opinion.user_score}}</p>
+                </div>
+                <div class="content-opinion">
+                    <p>{{ opinion.user_comment }}</p>
+                    <!-- <p>{{ opinion.created_at.strftime('%d %b %Y') }}</p> -->
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </section>
 </section>
+<script>
+    window.star = {{book.average_score}}
+</script>
 {% endblock %}
 

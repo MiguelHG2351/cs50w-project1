@@ -12,3 +12,6 @@ def find_user(email):
 
 def find_one_user(email):
     return db.find_by_id(table, email, "email")
+
+def find_one_id(user_id):
+    return db.find_by_id(table, user_id)
