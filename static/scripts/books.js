@@ -24,7 +24,7 @@ function renderTemplate(title, isbn, author) {
     const template = `
     <li>
         <div class="book-image">
-            <img src="https://dummyimage.com/120x120.png/dddddd/000000&text=${title}" alt="${title}">
+            <img src="https://dummyimage.com/120x120.png/306bdd/000000&text=${title}" alt="${title}">
         </div>
         <div class="books-description">
             <h2>${title}</h2>

@@ -1,1 +1,35 @@
-@import "./layout.scss";
+.container {
+    width: 80%;
+    margin: 0 auto;
+
+    .list-books {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        list-style: none;
+        gap: 2rem;
+        padding-left: 0;
+
+        li {
+            display: inline-block;
+            box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.15);
+
+            .book-image {
+                img {
+                    width: 100%;
+                }
+            }
+
+            .books-description {
+                padding: 1rem 2rem;
+                a {
+                    display: inline-block;
+                    background-color: #0099ff;
+                    text-decoration: none;
+                    padding: .5rem;
+                    border-radius: 6px;
+                    color: #000;
+                }
+            }
+        }
+    }
+}

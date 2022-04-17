@@ -40,3 +40,9 @@
         justify-content: space-between;
     }
 }
+
+@media screen and (max-width: 438px) {
+    .book_info {
+        flex-direction: column;
+    }
+}

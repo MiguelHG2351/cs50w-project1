@@ -52,6 +52,7 @@ $opinionForm.addEventListener('submit', (e) => {
         console.log(res)
         if(res.success) {
             alertSuccess('Opinion submitted successfully')
+            window.location.reload()
         } else {
             alertError(res.message)
             $opinionForm.reset()

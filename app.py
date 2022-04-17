@@ -22,7 +22,6 @@ from functools import wraps
 
 # security with werkzeug
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -41,25 +40,22 @@ db = scoped_session(sessionmaker(bind=engine))
 # set up database2
 SQL_Lib()
 
+def isLoggedIn(callback):
+    try:
+        verify = jwt.decode(request.cookies.get('token'), os.getenv('JWT_SECRET_KEY'), algorithms=['HS256'])
+        return callback()
+    except jwt.InvalidTokenError:
+        return redirect('/logout')
 def isAutenticated(f):
     @wraps(f)
     def decorateFn(*args, **kwargs):
         if request.cookies.get('token'):
-            try:
-                verify = jwt.decode(request.cookies.get('token'), os.getenv('JWT_SECRET_KEY'), algorithms=['HS256'])
-                return f(*args, **kwargs)
-            except jwt.InvalidTokenError:
-                return redirect('/register')
+            return isLoggedIn(lambda: f(*args, **kwargs))
         else:
-            return redirect('/register')
+            return redirect('/login')
     return decorateFn
 
 @app.route("/")
-@isAutenticated
-def index():
-    return render_template("index.html")
-
-@app.route("/books")
 @isAutenticated
 def books_fn():
     get_host_and_protocol = request.url_root
@@ -68,7 +64,7 @@ def books_fn():
     except Exception as e:
         print('K')
 
-    return render_template("books.html", books=get_some_books.json())
+    return render_template("index.html", books=get_some_books.json())
 
 @app.route("/books/<book_isbn>", methods=["GET", "POST"])
 @isAutenticated
@@ -144,6 +140,9 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.cookies.get('token'):
+        return isLoggedIn(lambda: redirect('/'))
+
     if request.method == 'POST':
         email = request.form.get("email")
         password = request.form.get("password")
@@ -164,7 +163,7 @@ def login():
                 "nbf": datetime.datetime.utcnow()
             }, key=os.getenv('JWT_SECRET_KEY'), algorithm='HS256')
 
-            response.set_cookie('token', token)
+            response.set_cookie('token', token, httponly=True, samesite='Strict')
             return response
         else:
             return jsonify({"success": False, "message": "Wrong credentials"})
@@ -209,27 +208,48 @@ def get_book():
     if(isbn == None):
         return jsonify({"success": False, "message": "Please provide an ISBN"})
     book = find_isbn(isbn)
-    get_google_book_info = requests.get(f'https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}').json()['items'][0]
+
+    if not book['success']:
+        return jsonify({"success": False, "message": "Something went wrong"})
+    if book['data'] is None:
+        return jsonify({"success": False, "message": "Book not found"})
+    try:
+        get_google_book_info = requests.get(f'https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}').json()
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "message": f"Google API error {e}"})
     
-    if(book['success']):
+    if get_google_book_info['totalItems'] > 0:
+        book_info = get_google_book_info['items'][0]['volumeInfo']
+        # print(book_info)
         data = book['data']
         return jsonify({
             "isbn": data['isbn'],
             "title": data['title'],
             "author": data['author'],
             "year": data['year'],
-            "review_count": get_google_book_info['volumeInfo']['ratingsCount'],
-            "average_score": get_google_book_info['volumeInfo']['averageRating'],
-            'picture': get_google_book_info['volumeInfo']['imageLinks']['thumbnail'],
+            "review_count": book_info.get('ratingsCount', 0),
+            "average_score": book_info.get('averageRating', 0),
+            'picture': book_info['imageLinks'].get('thumbnail', ''),
         })
     else:
-        return jsonify({"success": False, "message": "Something went wrong"})
+        return jsonify({
+            "isbn": book['data']['isbn'],
+            "title": book['data']['title'],
+            "author": book['data']['author'],
+            "year": book['data']['year'],
+            "review_count": 0,
+            "average_score": 0,
+            'picture': '',
+        })
 
 @app.route('/api/v1/find_books', methods=['GET'])
 def find_books_():
     available_filters = ('isbn', 'title', 'author')
     limit = 10
     filterBy = request.args.get('filterBy')
+    value = request.args.get('value')
+    print(value)
 
     if filterBy not in available_filters:
         return jsonify({"success": False, "message": "Filter not available"})

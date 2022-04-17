@@ -4,7 +4,43 @@
 <link rel="stylesheet" href="/static/styles/index.css">
 {% endblock %}
 
+{% block scripts %}
+<script src="/static/scripts/books.js" type="module"></script>
+{% endblock %}
 
 {% block content %}
-<p>Si</p>
+<section class="container">
+
+    <form id="findBook">
+        <input type="text" name="find" placeholder="Buscar libro">
+        <label>
+            <input type="radio" value="isbn" name="filterBy" id="isbn">
+            ISBN
+        </label>
+        <label>
+            <input type="radio" value="title" name="filterBy" id="title">
+            Titulo
+        </label>
+        <label>
+            <input type="radio" value="author" name="filterBy" id="author">
+            Autor
+        </label>
+    </form>
+
+    <ul class="list-books" id="list-books">
+        {% for book in books %}
+            <li>
+                <div class="book-image" align="center">
+                    <img src="https://dummyimage.com/128x72.png/306bdd/000000&text={{ book.title }}" alt="{{ book.title }}">
+                </div>
+                <div class="books-description">
+                    <h2>{{ book.title }}</h2>
+                    <strong>{{ book.author }}</strong>
+                    <p>{{ book.isbn }}</p>
+                    <a href="/books/{{ book.isbn }}">Más información</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
 {% endblock %}
